@@ -25,6 +25,11 @@
 
 Однако мы воспользовались предметным знанием о данных и в качестве первого предложения использовали то, в котором отсутствует "риа новости".
 
+### Textrank
+Мы воспользовались классическим алгоритмом экстрактивной суммаризации -- textrank. В его случае мы посчитали средний размер заголовка и указали это значение в качестве параметра, который отвечает за количество предложений на выходе алгоритма.
+
+Помимо этого, мы решили попробовать извлекать ключевые слова, руководствуясь этим же правилом.
+
 ### Transformer
 Поскольку на соревнование был отведен, месяц, то мы, в первую очередь решили повторить результаты, описанные в статье ВКонтакте [cite]. Нами была взята реализация трансформера из Open NMT, с параметрами, описанными в статье.
 
@@ -36,7 +41,27 @@
 
 \[Тут будет таблица с численными результатами на Leaderboard-е\]
 
+|Метод                 |Score         |
+|----------------------|--------------|
+|Baseline              |0.19500071    |
+|First sentence        |__0.19502427__|
+|Wiki BPE transformer  |0.16397515    |
+|Ria BPE transformer   |0.16131584    |
+|Textrank summarization|0.10764881    |
+|Textrank keywords     |0.06259589    |
+
 \[Тут будет таблица с численными результатами на наших тестовых данных\]
+
+|Метод                                   |Score         |
+|----------------------------------------|--------------|
+|Baseline                                |              |
+|First sentence                          |              |
+|Wiki BPE transformer                    |              |
+|Ria BPE transformer                     |              |
+|Textrank summarization                  |              |
+|Textrank keywords                       |              |
+|Textrank summary -> Wiki BPE transformer|              |
+|Textrank summary -> Ria BPE transformer |              |
 
 ## Related work
 <!-- This section is obligatory. In this section describe key papers and ideas in the domain of text summariation and headline summarization and cite the works and implementations, if any, you used. Below you can find an instruction on how to cite a paper in the {\LaTeX} style of Dialogue papers. -->
