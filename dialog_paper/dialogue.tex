@@ -57,15 +57,12 @@ Behavox, Санкт-Петербург, Россия
 \selectlanguage{english}
 
 \section{Introduction}
-Describe (briefly!):
-\begin{enumerate}
-    \item the task and the dataset
-    \item your approach and cite some major works, it was based on
-    \item the structure of your paper
-\end{enumerate}
+The problem of generating headers is a specific summrization problem, where output of a model is just a short single sentence. Conceptually, there are two approaches to the problem: extractive and abstractive summarization. In the case of extractive summarization, only the original text is used. Abstractive summarization is different in that the output text may contain words that were not in the source material.
+
+In this article, we describe our results in the header generation competition, which was organized by VKontakte for Dialog Evaluation. In our work, we used extractive and abstractive summarization. The methods used by us are described in the experiments section, the results of our models on the leaderboard and on our test set are given in the results section. At the end of the work, we present our conclusions on the competition and our thoughts on what can be improved.
 
 \section{System description}
-In the headline generation competition, we've decided to compare classical summatization approaches (textrank), which do not require training and approaches based on neural networks. As a result, we've managed to get the results in the leaderboard only for part of our experiments, specifically for the first sentence, transformer-architecture with bpe \cite{} trained on Wikipedia \cite{} and trained on the competition data. We used the implementation of the transformer from the library of Open Neural Machine Translation \cite{}. The launch code for training, predictions, and models can be found in our repository \footnote{https://github.com/kuparez/headline\_generator}.
+In the headline generation competition, we've decided to compare classical summatization approaches (textrank), which do not require training and approaches based on neural networks. As a result, we've managed to get the results in the leaderboard only for part of our experiments, specifically for the first sentence, transformer-architecture \cite{DBLP:journals/corr/VaswaniSPUJGKP17} with bpe trained on Wikipedia \cite{heinzerling2018bpemb} and trained on the competition data. We used the implementation of the transformer from the library of Open Neural Machine Translation \cite{2017opennmt}. The launch code for training, predictions, and models can be found in our repository \footnote{https://github.com/kuparez/headline\_generator}.
 
 \section{Data and training}
 Competition data was provided in the form of raw pieces of original html pages from Ria News. This means that there were various html tags and entities present in the data. And each news and a matching headline in raw text.
@@ -93,11 +90,11 @@ However, we used substantive knowledge about the data and as the first sentence 
 
 \subsection{Textrank}
 
-We used the classic extractive summatization algorithm - textrank \cite{}. To create a summary using keywords and original sentences we've set extraction size to be 20\% of the original text.
+We used the classic extractive summatization algorithm - textrank \cite{DBLP:journals/corr/BarriosLAW16}. To create a summary using keywords and original sentences we've set extraction size to be 20\% of the original text.
 
 \subsection{Transformer}
 
-Since the competition was held for only a month, we've decided to repeat the results described in the article VKontakte \cite{}. We took the implementation of the transformer from Open NMT, with the parameters described in the article.
+Since the competition was held for only a month, we've decided to repeat the results described in the article VKontakte \cite{gavrilov2018self}. We took the implementation of the transformer from Open NMT, with the parameters described in the article.
 
 Then, we tried to focus on what to use as input for the model. We tried the first sentence according to the rules above. We've also tried as an input first 2000 bpe tokens.
 
@@ -109,12 +106,14 @@ As a result, none of the models we've trained could show better results than the
   \centering
   \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
     \hline
-    Algorithm\textbackslash{}Score                                                       & 1F   & 1P   & 1R   & 2F   & 2P   & 2R   & LF   & LP   & LR   \\ \hline
-    First sentence                                                                       & 0.23 & 0.16 & 0.44 & 0.10 & 0.07 & 0.21 & 0.16 & 0.15 & 0.40 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Wiki BPE \\ transformer\\ (first sentence)\end{tabular}   & 0.37 & 0.39 & 0.36 & 0.20 & 0.21 & 0.19 & 0.34 & 0.37 & 0.34 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Ria BPE \\ transformer\\ (2000 first tokens)\end{tabular} & 0.36 & 0.37 & 0.35 & 0.18 & 0.20 & 0.18 & 0.33 & 0.36 & 0.33 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Textrank \\ summarization\end{tabular}                    & 0.14 & 0.09 & 0.41 & 0.05 & 0.03 & 0.17 & 0.09 & 0.08 & 0.38 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Textrank\\ keywords\end{tabular}                          & 0.09 & 0.07 & 0.18 & 0.00 & 0.00 & 0.01 & 0.05 & 0.05 & 0.14 \\ \hline
+    Algorithm\textbackslash{}Score                                                             & 1F   & 1P   & 1R   & 2F   & 2P   & 2R   & LF   & LP   & LR   \\ \hline
+    First sentence                                                                             & 0.23 & 0.16 & 0.44 & 0.10 & 0.07 & 0.21 & 0.16 & 0.15 & 0.40 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Wiki BPE \\ transformer\\ (first sentence)\end{tabular}         & 0.37 & 0.39 & 0.36 & 0.20 & 0.21 & 0.19 & 0.34 & 0.37 & 0.34 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Wiki BPE \\ transformer\\ (first sentence, beam=5)\end{tabular} & 0.39 & 0.41 & 0.39 & 0.22 & 0.23 & 0.22 & 0.37 & 0.39 & 0.37 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Wiki BPE \\ transformer\\ (first sentence, beam=1)\end{tabular} & 0.37 & 0.37 & 0.37 & 0.20 & 0.20 & 0.20 & 0.34 & 0.36 & 0.35 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Ria BPE \\ transformer\\ (2000 first tokens)\end{tabular}       & 0.36 & 0.37 & 0.35 & 0.18 & 0.20 & 0.18 & 0.33 & 0.36 & 0.33 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Textrank \\ summarization\end{tabular}                          & 0.14 & 0.09 & 0.41 & 0.05 & 0.03 & 0.17 & 0.09 & 0.08 & 0.38 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Textrank\\ keywords\end{tabular}                                & 0.09 & 0.07 & 0.18 & 0.00 & 0.00 & 0.01 & 0.05 & 0.05 & 0.14 \\ \hline
     \end{tabular}
   \caption{ROUGE-1,2,F1, precision and recall scores.}
 \end{table}
@@ -126,8 +125,8 @@ As a result, none of the models we've trained could show better results than the
     Algorithm                                                                                            & Score      \\ \hline
     Baseline                                                                                             & 0.19500071 \\ \hline
     First sentence                                                                                       & 0.19502427 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Wiki BPE \\ transformer\\ (first sentence, no beam search)\end{tabular}   & 0.16397515 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Ria BPE \\ transformer\\ (2000 first tokens, no beam search)\end{tabular} & 0.16131584 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Wiki BPE \\ transformer\\ (first sentence, no beam search=5)\end{tabular} & 0.16397515 \\ \hline
+    \begin{tabular}[c]{@{}l@{}}Ria BPE \\ transformer\\ (2000 first tokens, beam search=5)\end{tabular}  & 0.16131584 \\ \hline
     \begin{tabular}[c]{@{}l@{}}Textrank \\ summarization\end{tabular}                                    & 0.10764881 \\ \hline
     \begin{tabular}[c]{@{}l@{}}Textrank\\ keywords\end{tabular}                                          & 0.06259589 \\ \hline
   \end{tabular}
@@ -137,12 +136,12 @@ As a result, none of the models we've trained could show better results than the
 Competition used mean of ROUGE-1,2,L F1 score.
 
 \section{Related work}
-The main article, that we've used as an inspiration, was the article VKontakte \cite{}. From there, we got the idea to use bpe \cite{}, as well as which hyperparameters to use for training of transformer \cite{}. Then, we've started to browse their citations and we've found that there were a some criticism about what to use as an input to abstractive headline generation algorithms. As a result, we stumbled upon an article where the choice of the first sentence as an input to models was being criticised and authors discussed ways to extract so-called Topic Sentence \cite{} is proposed.
+The main article, that we've used as an inspiration, was the article VKontakte \cite{gavrilov2018self}. From there, we got the idea to use bpe \cite{DBLP:journals/corr/SennrichHB15}, as well as which hyperparameters to use for training of transformer. Then, we've started to browse their citations and we've found that there were a some criticism about what to use as an input to abstractive headline generation algorithms. As a result, we stumbled upon an article where the choice of the first sentence as an input to models was being criticised and authors discussed ways to extract so-called Topic Sentence \cite{Putra2018IncorporatingTS} is proposed.
 
 \section{Conclusion and future work}
 We have seen that the first sentence is a very strong baseline in the problem of generating headers. We have tried various options for preprocessing data, but none of them helped us improve the results of transformer.
 
-We think that in future work it is worth trying to generate a topic sentence on the 5W1H principle described in \cite{}, and the problem may lie in the wrong choice of model hyper parameters.
+We think that in future work it is worth trying to generate a topic sentence on the 5W1H principle described in \cite{Putra2018IncorporatingTS}, and the problem may lie in the wrong choice of model hyper parameters.
 
 
 \color{blue}\section*{References}
