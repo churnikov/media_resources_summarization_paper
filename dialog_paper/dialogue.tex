@@ -87,7 +87,9 @@ As for byte pair encoding, BPE pretrained on Wikipedia turned all numbers into z
 For all experiments, we used the preprocessing as described above. For training of our models we used 8 Nvidia K80.
 
 \subsection{Evaluation}
+It is common practice to use ROUGE score \cite{Lin:2004} in summarization problems. In practice, so-called ROUGE 1,2, L - precision, recall, F1 metrics are being used. The names in ROUGE X - Y denote the following: X is the number of ngramm used to calculate the Y metric. In the case of ngramm of size L, the longest common subsequence from predicted sequence found in original sequence. Y metrics are classic accuracy, recall and F1 score.
 
+In the competition, for the calculation of quality, the average of ROUGE 1, 2, L - F1 score was used.
 
 \subsection{First sentence}
 
@@ -126,7 +128,7 @@ As could be seen in Table 1, none of the models we've trained could show better 
   \caption{Results from evaluation by VK servers. Score is mean of ROUGE-1,2,L F1 score.}
 \end{table}
 
-Table 2 show results of evaluation on our test set. Surprisingly, we've got much better results on our split, than on public leaderboard. And specifically, neural networks perform much better than first sentence model. It's worth pointing out that transformer trained with RIA BPE perform slightly worse than transformer with Wiki BPE. We think, the reason for that might be that model is more robust, because it doesn't need to predict any variation of numbers, because all numeric data is reduced to zeros.
+Table 2 show results of evaluation on our test set. Surprisingly, we've got much better results on our split, than on public leaderboard. And specifically, neural networks perform much better than first sentence model. It's worth pointing out that transformer trained with RIA BPE perform slightly worse than transformer with Wiki BPE. We think, the reason for that might be that model is more robust, because it doesn't need to predict any variation of numbers, because all numeric data is reduced to zeros. Unfortunately, taxtrank based model didn't show good results for F1 score, but recall is pretty high. It's probably due to extraction of too much information.
 
 Another thing is that local evaluation show better results than VK server evaluation. So we decided to check for data leaks. We assumed that there could be none, because for train\/test split we used scikit learn \cite{scikit-learn} train test split method. We checked, how many texts in our test set are identical to texts in train. It turned out that 975 texts in test set were found in train set.
 
@@ -174,16 +176,16 @@ Score & Example \\ \hline
 0.00 & \begin{tabular}[c]{@{}l@{}}\textbf{Text}: более 70 международных художников и арт-групп примут участие в основном\\проекте "больше света" \\ 5-й московской биеннале современного искусства,который будет показан в цвз "манеж" \\ с 20 сентября по 20 октября, сообщили риа новости в пресс-службе проекта.\\ \textbf{Ground truth}: стали известны все участники основного проекта\\5-й московской биеннале\\ \textbf{Prediction}: более 00 художников представят проект "больше света" в "манеже"\end{tabular} \\ \hline
 0.99 & \begin{tabular}[c]{@{}l@{}}\textbf{Text}: фонд "сколково" и корпорация intel подписали в четверг соглашение\\о сотрудничестве, передает корреспондент риа новости.\\ \textbf{Ground truth}: "сколково" и intel подписали соглашение о сотрудничестве\\ \textbf{Prediction}: "сколково" и intel подписали соглашение о сотрудничестве\end{tabular} \\ \hline
 \end{tabular}
-\caption{Worse and best model performances}
+\caption{Worse and best model performances. Score is mean of ROUGE-1,2,L F1 score.}
 \end{table}
 
 \section{Related work}
 The main article, that we've used as an inspiration, was the article VKontakte \cite{gavrilov2018self}. From there, we got the idea to use BPE \cite{DBLP:journals/corr/SennrichHB15}, as well as which hyperparameters to use for training of transformer. Then, we've started to browse their citations and we've found that there were a some criticism about what to use as an input to abstractive headline generation algorithms. As a result, we stumbled upon an article where the choice of the first sentence as an input to models was being criticized and authors discussed ways to extract so-called Topic Sentence \cite{Putra2018IncorporatingTS} is proposed.
 
 \section{Conclusion and future work}
-We have seen that the first sentence is a very strong baseline in the problem of generating headers. We have tried various options for preprocessing data, but none of them helped us improve the results of transformer.
+We have seen that the first sentence is a very strong baseline in the problem of generating headers. We have tried various options for preprocessing data, but none of them helped us improve the results of transformer on public leaderboard.
 
-We think that in future work it is worth trying to generate a topic sentence on the 5W1H principle described in \cite{Putra2018IncorporatingTS}, and the problem may lie in the wrong choice of model hyper parameters.
+We think that in future work it is worth trying to generate a topic sentence on the 5W1H principle described in \cite{Putra2018IncorporatingTS} or use as an input textrank summarization due to it's high recall.
 
 
 \color{blue}\section*{References}
