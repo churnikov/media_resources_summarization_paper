@@ -181,6 +181,8 @@ Score & Example \\ \hline
 \caption{Worse and best model performances. Score is mean of ROUGE-1,2,L F1 score.}
 \end{table}
 
+In table 4,the mean of ROUGE-1,2, L F1 is used as the score. In the table, we present two of the worst headline options that Wiki transformer can produce on data without a train leak in test.
+
 \section{Related work}
 The main article, that we've used as an inspiration, was the article VKontakte \cite{gavrilov2018self}. From there, we got the idea to use BPE \cite{DBLP:journals/corr/SennrichHB15}, as well as which hyperparameters to use for training of transformer. Then, we've started to browse their citations and we've found that there were a some criticism about what to use as an input to abstractive headline generation algorithms. As a result, we stumbled upon an article where the choice of the first sentence as an input to models was being criticized and authors discussed ways to extract so-called Topic Sentence \cite{Putra2018IncorporatingTS} is proposed.
 
