@@ -81,7 +81,7 @@ However, if our models got empty string during inference, we used most common wo
 
 Then, for training and validation of transformer, we've split the data in such a way that 90\% of data goes for training and 10\% for test. For test set creation we just shuffled data. For reproduction purposes we provide in our repository test set file.
 
-As for byte pair encoding, BPE pretrained on Wikipedia turned all numbers into zeros. However BPE trained from scratch on RIA news dataset preserved numbers.
+As for byte pair encoding, BPE pretrained on Wikipedia turned all numbers into zeros. However BPE trained from scratch on RIA news dataset preserved numbers. We also should note that we've used same BPE tokenization for encoder and deocder traings.
 
 \section{Experiments}
 For all experiments, we used the preprocessing as described above. For training of our models we used 8 Nvidia K80.
@@ -103,7 +103,7 @@ We used the classic extractive summarization algorithm - textrank \cite{DBLP:jou
 
 \subsection{Transformer}
 
-Since the competition was held for only a month, we've decided to repeat the results described in the article VKontakte \cite{gavrilov2018self}. We took the implementation of the transformer from Open NMT, with the parameters described in the article.
+Since the competition was held for only a month, we've decided to repeat the results described in the article VKontakte \cite{gavrilov2018self} that used universal transformer \cite{DBLP:journals/corr/VaswaniSPUJGKP17, DBLP:journals/corr/abs-1807-03819}. We took the implementation of the transformer from Open NMT \cite{2017opennmt}, with the parameters described in the article.
 
 Then, we tried to focus on what to use as input for the model. We tried the first sentence according to the rules above. We've also tried as an input first 2000 BPE tokens.
 
