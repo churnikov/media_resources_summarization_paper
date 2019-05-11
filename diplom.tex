@@ -127,6 +127,8 @@ centertags]{article} %%
 % оценка качества по автоматизированным метрикам, и как они коррелируют с оценками людей.
 % Сравниться с бэйзлайном.
 
+\section{Описание системы}
+
 \section{Алгоритмы, использованные в работе}
 Нами были использованы как классические подходы, так и новые, основанные на нейронных сетях.
 В следующих секциях мы опишем их основные принципы, а также приведем ссылки на их реализации.
@@ -243,6 +245,7 @@ TopicRank - это метод обучения без учителя, целью
 % Помимо этого, как для текстовых данных, так и для изображений, мы  использовали
 % Яндекс.Толоку \cite{yandex_toloka_2019}, чтобы привлечь людей к оценке качества наших результатов.
 
+
 \section{Анализ использованных данных}
 % Рассказать про датасет Риа новостей и данные из ВК.
 
@@ -253,6 +256,20 @@ TopicRank - это метод обучения без учителя, целью
 текстов.
 
 \subsection{Данные выделения ключевых слов}
+
+\begin{table}[ht]
+  \begin{center}
+    \begin{tabular}{|l|l|l|l|}
+      \hline
+      \textbf{Датасет} & \textbf{Тип} & \textbf{\begin{tabular}[c]{@{}l@{}}Количество \\ документов\end{tabular}} & \textbf{\begin{tabular}[c]{@{}l@{}}Среднее \\ количество \\ токенов\end{tabular}} \\ \hline
+      Киберленика & Абстракты & 4072 & 5.27 \\ \hline
+      Habr & Блоги & 3990 & 5.03 \\ \hline
+      Независимая газета & Новости & 1987 & 6.11 \\ \hline
+      Россия сегодня & Новости & 7217 & 10.07 \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
 Для анализа качества использованных алгоритмов для выделения ключевых слов
 мы воспользовались датасетом с разнообразными статьями на русском языке \cite{mannefedov2019}.
 В наборе присутствуют научные статьи из "журнала киберленика" \cite{cyberlenica},
@@ -260,26 +277,46 @@ TopicRank - это метод обучения без учителя, целью
 
 Таким образом, мы приводим русскоязычные аналоги всем англоязычным ресурсам из таблицы \ref{keywords_extraction_report}.
 
+\subsection{Данные для генерации заголовков}
 
-\section{}
-For all experiments, we used the preprocessing as described above. For training of our models we used 8 Nvidia K80.
+Для обучения и выбора алгоритмов генерации заголовков, мы воспользовались недавно опубликованным
+датасетом Риа новостей. Этот датасет содержит новости с января 2010 по декабрь 2014.
+В нем имеется 1003869 новостных статей со средним размером заголовка 9.5 слов и
+средней длинной текста 315.6 слов.
 
-\subsection{Evaluation}
-It is common practice to use ROUGE score \cite{Lin:2004} in summarization problems. In practice, so-called ROUGE 1,2, L - precision, recall, F1 metrics are being used. The names in ROUGE X - Y denote the following: X is the number of ngramm used to calculate the Y metric. In the case of ngramm of size L, the longest common subsequence from predicted sequence found in original sequence. Y metrics are classic accuracy, recall and F1 score.
+Эти датасет предоставлен в виде необработанных фрагментов оригинальных html-страниц.
+Это означает, что в данных присутствовали различные HTML-теги и объекты.
+В итоге имеется необработанная новость и соответствующий заголовок.
 
-In the competition, for the calculation of quality, the average of ROUGE 1, 2, L - F1 score was used.
+\begin{verbatim}
 
-\subsection{First sentence}
+<p> <strong> <\strong> <\p> \n <p> <strong> Moscow,
+Dec 1 &nbsp; &mdash; RIA news. <\strong> a fire in &nbsp;
+one of the &nbsp; workshops in &nbsp;...<\p>
+\end{verbatim}
+
+В результате первым делом мы попытались очистить данные от ненужной информации. И так, мы создали препроцессор, который удаляет все html-теги и сущности.
+
+Кроме того, мы обнаружили, что иногда в данных отсутствует текст, поскольку исходные новости представлены в виде изображений (например, снимок экрана Twitter), а новости чисто польские. Это все выбросы, с которых мы очистили данные.
+
+
+\section{Эксперименты}
+В данной секции мы приводим технические детали, параметры моделей и оценки качества созданных моделей на датасетах описанных выше.
+
+\subsection{Генерация заголовка}
+На практике обычно используется метрика ROUGE \cite{Lin: 2004} при оценке качества алгоритмов суммаризации. Конкретно используются так называемые ROUGE 1,2, L - точность, полнота и F1. Имена в ROUGE X - Y обозначают следующее: X - количество n-грамм, используемых для вычисления метрики Y. В случае n-грамм размера L рассматривается самая длинная общая подпоследовательность из предсказанной последовательности найденая в исходной последовательности. Метрики Y - классическая точность, полнота и их среднее гармоническое.
+
+\subsubsection{First sentence}
 
 As described in \cite{Putra2018IncorporatingTS}, the first sentence for automatically creating a news headline is a very strong baseline. In particular, in the headline generation competition, the first sentence of news articles was proposed as a baseline solution.
 
 However, we used our knowledge about the data and besides removal of html tags and entities we've also skipped first sentences with "риа новости" in it. This allowed us to skip sentences with information about the date the news was posted as these sentences did not contain any information besides that.
 
-\subsection{Textrank}
+\subsubsection{Textrank}
 
 We used the classic extractive summarization algorithm - textrank \cite{DBLP:journals/corr/BarriosLAW16}. We took implementation of this algorithm from gensim \cite{rehurek_lrec} To create a summary using keywords and original sentences we've set extraction size to be 20\% of the original text.
 
-\subsection{Transformer}
+\subsubsection{Universal Transformer}
 
 Since the competition was held for only a month, we've decided to repeat the results described in the article VKontakte \cite{gavrilov2018self}. We took the implementation of the transformer from Open NMT, with the parameters described in the article.
 
@@ -287,31 +324,7 @@ Then, we tried to focus on what to use as input for the model. We tried the firs
 
 Due to restrictions on VK servers we could not make very complex predictions. There for, during predictions on leaderboard we've used beam search of size 5. But for evaluation on our test set we used beam size of 10.
 
-\section{Results}
-
-As could be seen in Table 1, none of the models we've trained could show better results than the preprocessed first sentence. Unfortunately, we could not check some of our models on VK servers due to the restrictions on time complexity of our models. For this reason, we also present results on our test set.
-
-\begin{table}[htbp]
-  \small
-  \centering
-  \begin{tabular}{|l|l|}
-    \hline
-    Algorithm                                                                                            & Score      \\ \hline
-    Baseline                                                                                             & 0.19500071 \\ \hline
-    First sentence                                                                                       & 0.19502427 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Wiki BPE transformer (first sentence, no beam search=5)\end{tabular} & 0.16397515 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Ria BPE transformer (2000 first tokens, beam search=5)\end{tabular}  & 0.16131584 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Textrank summarization\end{tabular}                                    & 0.10764881 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Textrank keywords\end{tabular}                                          & 0.06259589 \\ \hline
-  \end{tabular}
-  \caption{Results from evaluation by VK servers. Score is mean of ROUGE-1,2,L F1 score.}
-\end{table}
-
-Table 2 show results of evaluation on our test set. Surprisingly, we've got much better results on our split, than on public leaderboard. And specifically, neural networks perform much better than first sentence model. It's worth pointing out that transformer trained with RIA BPE perform slightly worse than transformer with Wiki BPE. We think, the reason for that might be that model is more robust, because it doesn't need to predict any variation of numbers, because all numeric data is reduced to zeros. Unfortunately, taxtrank based model didn't show good results for F1 score, but recall is pretty high. It's probably due to extraction of too much information.
-
-Another thing is that local evaluation show better results than VK server evaluation. So we decided to check for data leaks. We assumed that there could be none, because for train\/test split we used scikit learn \cite{scikit-learn} train test split method. We checked, how many texts in our test set are identical to texts in train. It turned out that 975 texts in test set were found in train set.
-
-Then we decided to check original data and find how many training examples are identical. We found, that 2651 texts are identical.
+\subsubsection{Results}
 
 \begin{table}[htbp]
   \small
@@ -330,22 +343,6 @@ Then we decided to check original data and find how many training examples are i
   \caption{ROUGE-1,2,F1, precision and recall scores.}
 \end{table}
 
-After our discovery of a leak in our test set distribution, we decided to check performance of our best abstractive summarization model, transformer with Wikipedia BPE with beam search equal to 5 on dataset with train set leak removed.
-
-\begin{table}[htbp]
-  \centering
-  \small
-  \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
-    \hline
-    Algorithm\textbackslash{}Score                                                             & 1F   & 1P   & 1R   & 2F   & 2P   & 2R   & LF   & LP   & LR   \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Wiki BPE transformer\\ (first sentence, beam=5 with leak)\end{tabular} & 0.39 & 0.41 & 0.39 & 0.22 & 0.23 & 0.22 & 0.37 & 0.39 & 0.37 \\ \hline
-    \begin{tabular}[c]{@{}l@{}}Wiki BPE transformer\\ (first sentence, beam=5 no leak)\end{tabular} & 0.39 & 0.40 & 0.39 & 0.22 & 0.23 & 0.22 & 0.36 & 0.38 & 0.37 \\ \hline
-    \end{tabular}
-  \caption{Model evaluation without leak}
-\end{table}
-
-As expected, model performed slightly worse, but still pretty good, so it's still hard to tell, why there is such a great difference between results on out test set and evaluation results from competition servers.
-
 \begin{table}[htbp]
 \scriptsize
 \centering
@@ -356,10 +353,18 @@ Score & Example \\ \hline
 0.00 & \begin{tabular}[c]{@{}l@{}}\textbf{Text}: более 70 международных художников и арт-групп примут участие в основном\\проекте "больше света" \\ 5-й московской биеннале современного искусства,который будет показан в цвз "манеж" \\ с 20 сентября по 20 октября, сообщили риа новости в пресс-службе проекта.\\ \textbf{Ground truth}: стали известны все участники основного проекта\\5-й московской биеннале\\ \textbf{Prediction}: более 00 художников представят проект "больше света" в "манеже"\end{tabular} \\ \hline
 0.99 & \begin{tabular}[c]{@{}l@{}}\textbf{Text}: фонд "сколково" и корпорация intel подписали в четверг соглашение\\о сотрудничестве, передает корреспондент риа новости.\\ \textbf{Ground truth}: "сколково" и intel подписали соглашение о сотрудничестве\\ \textbf{Prediction}: "сколково" и intel подписали соглашение о сотрудничестве\end{tabular} \\ \hline
 \end{tabular}
-\caption{Worse and best model performances. Score is mean of ROUGE-1,2,L F1 score.}
+\caption{Лучшие и худшие результаты предсказания модели. Score среднее от ROUGE-1,2,L F1.}
 \end{table}
 
 In table 4,the mean of ROUGE-1,2, L F1 is used as the score. In the table, we present two of the worst headline options that Wiki transformer can produce on data without a train leak in test.
+
+\subsection{Выделение ключевых слов}
+
+% \subsubsection{Textrank}
+
+% \subsubsection{TopicRank}
+
+
 
 \section{Заключение}
 
