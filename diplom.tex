@@ -36,7 +36,7 @@ centertags]{article} %%
 
 % Title
 \textbf{\LARGE Суммаризация групп в социальных сетях}\\[1.0cm]
-\textbf{\Large Дипломная работа студента 645 группы} \\[0.2cm]
+\textbf{\Large Дипломная работа студента 646 группы} \\[0.2cm]
 \textbf{\Large Чурикова Никиты Сергеевича} \\[3.5cm]
 
 %supervisor
@@ -46,7 +46,8 @@ centertags]{article} %%
 \end{flushright}
  \begin{flushright} \large
 \emph{Рецензент:} \\
-Руководитель департамента вычислительной биологии \textsc{Яковлев П. А.}
+% TODO: Убрать биологию
+Директор департамента управления информационными потоками \textsc{Яковлев П. А.}
 \end{flushright}
 \begin{flushright} \large
 \emph{Заведующий кафедрой:} \\
@@ -60,6 +61,40 @@ centertags]{article} %%
 \end{center}
 \end{titlepage}
 
+\begin{titlepage}
+\begin{center}
+% Upper part of the page
+\textbf{\Large SAINT PETERSBURG STATE UNIVERSITY} \\[1.0cm]
+\textbf{\large Mathematics and mechanics department} \\[0.2cm]
+\textbf{\large Sub-Department of Analytical Information System}\\[3.5cm]
+
+% Title
+\textbf{\LARGE News resources summarization in social networks}\\[1.0cm]
+\textbf{\Large Final thesis of student of 646 group} \\[0.2cm]
+\textbf{\Large Churikov Nikita Sergeevich} \\[3.5cm]
+
+%supervisor
+\begin{flushright} \large
+\emph{Scientific Supervisor:} \\
+Assistant Professor \textsc{Grafeeva N. G.}
+\end{flushright}
+ \begin{flushright} \large
+\emph{Reviewer:} \\
+% TODO: Убрать биологию
+Director of information flow department \textsc{Yakovlev P. A.}
+\end{flushright}
+\begin{flushright} \large
+\emph{Sub department director:} \\
+Assistant Professor \textsc{Michailova E. G.}
+\end{flushright}
+\vfill
+
+% Bottom of the page
+{\large {Saint Petersburg}} \par
+{\large {2019 г.}}
+\end{center}
+\end{titlepage}
+
 % Table of contents
 \tableofcontents
 
@@ -67,9 +102,9 @@ centertags]{article} %%
 Одной из задач обработки естественного языка является задача суммаризации текста.
 Ее целью является уменьшение размера исходного текста без потери ключевой информации.
 В данной работе мы решаем схожую проблему, но для информационных ресурсов в социальных сетях.
-В частности, необходимо рассмотреть задачу суммаризации текстов и картинок, поскольку
-это два основных источника информации. В тексте мы приводим численное обоснование
-выбранных методов, а также приводим оценку нашей суммаризации людьми.
+В частности, мы рассматриваем задачи генерации заголовков и выделения ключевых слов,
+поскольку тексты бывают разного объема и потому их можно сжимать разными способами.
+В тексте мы приводим численное обоснование выбранных методов и описываем интерфейс разработка.
 
 \section{Введение}
 В современном мире создается все больше и больше информации, которую мы можем потреблять.
@@ -162,6 +197,7 @@ centertags]{article} %%
 % http://www.dialog-21.ru/media/3995/sandrikova.pdf
 % YAKE
 % https://repositorio.inesctec.pt/bitstream/123456789/7623/1/P-00N-NF5.pdf
+% Браславский
 
 
 % \subsection{Полученные результаты}
@@ -407,25 +443,31 @@ Score & Example \\ \hline
 
 \subsection{Выделение ключевых слов}
 
-% \subsubsection{Textrank}
+Как видно из Таблицы \ref{mae_mean_kw}, по метрике F1, алгоритмы TopicRank и YAKE не ступают друг-другу, при этом YAKE показывает высокую точность, а TopicRank обладает высокой полнотой.
 
-% \subsubsection{TopicRank}
+Так что для конкретных задач есть смысл выбирать конкретный алгоритм: Если требуется скорость, то хороший выбор TfIdf, поскольку в нем нет каких либо трюков с признаками, а просто считается статистика. Если важно, чтобы было как можно меньше неправильных ключевых слов, то стоит использовать YAKE, а если важно то, чтобы извлекалось как можно больше релевантных примеров, то следует использовать TopicRank.
 
 \begin{table}[ht]
-\begin{tabular}{|l|l|l|l|}
-\hline
-\textbf{Алгоритм/Датасет} & P & R & F \\ \hline
-\textbf{TfIdf} & 20.0 & 14.1 & 16.4 \\ \hline
-\textbf{TopicRank} & 15.6 & 10.8 & 12.6 \\ \hline
-\textbf{YAKE} & 23.5 & 16.6 & 19.3 \\ \hline
-\end{tabular}
+  \begin{center}
+    \begin{tabular}{|l|l|l|l|}
+    \hline
+    \textbf{Алгоритм/Датасет} & P & R & F \\ \hline
+    \textbf{TfIdf} & 13 & 24 & 16 \\ \hline
+    \textbf{TopicRank} & 16 & 24 & 19.2 \\ \hline
+    \textbf{YAKE} & 23.5 & 16.6 & 19.3 \\ \hline
+    \end{tabular}
+    \caption{
+      \label{mae_mean_kw} Средняя абсолютная точность (P), полнота (R), и F1 мера на всех датасетах
+    }
+  \end{center}
 \end{table}
 
 \section{Заключение}
 
 В данной работе мы предложили решение задачи краткого описания новостного ресурса. Решение включает в себя путь того, как с этой системой будет взаимодействовать пользователь, техническую архитектуру системы, обоснование выбранных алгоритмов, отталкиваясь от соответствующих решаемых подзадач.
 
-Как результат, с алгоритмической точки зрения, система была разбита на две подзадачи: выделения ключевых слов и генерации заголовков. Нами были предложены лучшие алгоритмы, для решения соответствующих задач. В работе не был покрыт графический материал ввиду того, это является отдельным большим исследованием, при этом в этой работе мы заложили фундамент для дальнейших исследований в этой области, предоставив интерфейс для разработчиков и людей.
+% Убрать графическую часть
+Как результат, с алгоритмической точки зрения, система была разбита на две подзадачи: выделения ключевых слов и генерации заголовков. Нами были предложены лучшие алгоритмы, для решения соответствующих задач. Также в этой работе мы заложили фундамент для дальнейших исследований в этой области, предоставив интерфейс для разработчиков и людей.
 
 \section{Литература}
 
