@@ -38,6 +38,7 @@
     \let\NeedsTeXFormat\origNeedsTeXFormat
   }
 }
+
 \ProcessOptions\relax
 \LoadClass[a4paper,\my@fontsize]{\my@baseclass}
 
